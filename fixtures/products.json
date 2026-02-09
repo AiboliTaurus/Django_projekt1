@@ -1,0 +1,54 @@
+[
+{
+    "model": "catalog.product",
+    "pk": 1,
+    "fields": {
+        "name": "Смартфон iPhone 15 Pro",
+        "description": "Флагманский смартфон Apple с камерой 48 Мп",
+        "image": "",
+        "category": 1,
+        "price": "99999.00",
+        "created_at": "2026-02-09T22:19:29.929Z",
+        "updated_at": "2026-02-09T22:27:27.915Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 2,
+    "fields": {
+        "name": "Ноутбук ASUS ZenBook",
+        "description": "Ультрабук с процессором Intel Core i7",
+        "image": "",
+        "category": 1,
+        "price": "89999.00",
+        "created_at": "2026-02-09T22:19:29.935Z",
+        "updated_at": "2026-02-09T22:19:29.935Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 3,
+    "fields": {
+        "name": "Книга 'Мастер и Маргарита'",
+        "description": "Роман Михаила Булгакова, подарочное издание",
+        "image": "",
+        "category": 2,
+        "price": "1599.00",
+        "created_at": "2026-02-09T22:19:29.935Z",
+        "updated_at": "2026-02-09T22:19:29.935Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 4,
+    "fields": {
+        "name": "Футболка хлопковая",
+        "description": "Мужская футболка из 100% хлопка",
+        "image": "",
+        "category": 3,
+        "price": "1999.00",
+        "created_at": "2026-02-09T22:19:29.936Z",
+        "updated_at": "2026-02-09T22:19:29.936Z"
+    }
+}
+]
