@@ -1,10 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <!-- Логотип и название магазина -->
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+            <span class="fs-3 me-2">🛒</span>
+            <span class="fw-bold">Skystore</span>
+        </a>
+
+        <!-- Кнопка для мобильного меню -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Основное меню -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/' %}active{% endif %}"
+                       href="{% url 'home' %}">
+                        <i class="bi bi-house-door"></i> Главная
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}"
+                       href="{% url 'contacts' %}">
+                        <i class="bi bi-envelope"></i> Контакты
+                    </a>
+                </li>
+
+                <!-- Выпадающее меню с категориями (если понадобится) -->
+                {% if categories %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Категории
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% for category in categories %}
+                        <li>
+                            <a class="dropdown-item" href="#">{{ category.name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+
+            <!-- Правая часть меню -->
+            <ul class="navbar-nav">
+                <!-- 🔥 НОВАЯ КНОПКА: Добавить товар -->
+                <li class="nav-item">
+                    <a class="nav-link {% if '/product/create/' in request.path %}active{% endif %}"
+                       href="{% url 'product_create' %}">
+                        <i class="bi bi-plus-circle"></i> Добавить товар
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/" target="_blank">
+                        <i class="bi bi-gear"></i> Админка
+                    </a>
+                </li>
+
+                <!-- Поиск (можно добавить позже) -->
+                <li class="nav-item">
+                    <form class="d-flex" role="search" method="get" action="#">
+                        <input class="form-control form-control-sm me-2" type="search" placeholder="Поиск...">
+                        <button class="btn btn-sm btn-outline-light" type="submit">🔍</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Добавляем иконки Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<!-- Дополнительный стиль для активной кнопки -->
+<style>
+    .navbar-nav .nav-link.active {
+        font-weight: bold;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+    }
+</style>
