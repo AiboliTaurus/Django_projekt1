@@ -1,218 +1,167 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Skystore - Контакты</title>
-    <!-- Подключите статичеcкие файлы со стилями Bootstrap -->
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <style>
-        .contact-message {
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        .contact-date {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-    </style>
-</head>
-<body>
-<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-    <h5 class="my-0 mr-md-auto font-weight-normal">Skystore</h5>
-    <nav class="ms-5">
-        <a class="p-2 btn btn-outline-primary" href="/">Каталог</a>
-        <a class="p-2 btn btn-outline-primary" href="/contacts/">Контакты</a>
-        <a class="p-2 btn btn-outline-info" href="/admin/" target="_blank">Админка</a>
-    </nav>
-</div>
+{% extends 'catalog/base.html' %}
 
+{% block title %}Skystore - Контакты{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-message {
+        max-height: 100px;
+        overflow-y: auto;
+    }
+    .contact-date {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
     <h1 class="display-4">Контакты</h1>
     <p class="lead">Свяжитесь с нами или посмотрите предыдущие обращения</p>
 </div>
 
-<div class="container">
-    <div class="row text-start">
-        <!-- Левая колонка: Информация о компании и сохранённые контакты -->
-        <div class="col-lg-8 col-md-6 col-sm-12">
-            <div class="card mb-4 box-shadow">
-                <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">Информация о компании</h4>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <tr>
-                            <td class="w-25">Страна</td>
-                            <td>Россия</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">ИНН</td>
-                            <td>91-1144442</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">Адрес</td>
-                            <td>г. Москва, ул. Примерная, д. 123</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">Телефон</td>
-                            <td>+7 (999) 123-45-67</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">Email</td>
-                            <td>info@skystore.ru</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">Часы работы</td>
-                            <td>Пн-Пт: 9:00-20:00, Сб-Вс: 10:00-18:00</td>
-                        </tr>
-                    </table>
-                </div>
+<div class="row text-start">
+    <!-- Левая колонка: Информация о компании и сохранённые контакты -->
+    <div class="col-lg-8 col-md-6 col-sm-12">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Информация о компании</h4>
             </div>
-
-            <!-- Блок с сохранёнными контактами из БД -->
-            <div class="card mb-4 box-shadow">
-                <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">Сохранённые обращения</h4>
-                    <small class="text-muted">Всего: {{ contacts|length }}</small>
-                </div>
-                <div class="card-body">
-                    {% if contacts %}
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Имя</th>
-                                        <th scope="col">Телефон</th>
-                                        <th scope="col">Сообщение</th>
-                                        <th scope="col">Дата</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for contact in contacts|slice:":5" %}
-                                    <tr>
-                                        <td>{{ contact.name }}</td>
-                                        <td>{{ contact.phone }}</td>
-                                        <td>
-                                            <div class="contact-message">
-                                                {{ contact.message|truncatechars:100 }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="contact-date">
-                                                {{ contact.created_at|date:"d.m.Y" }}<br>
-                                                {{ contact.created_at|date:"H:i" }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        {% if contacts|length > 5 %}
-                            <div class="alert alert-info mt-3">
-                                <small>Показано 5 из {{ contacts|length }} обращений.
-                                Все обращения доступны в <a href="/admin/catalog/contact/" target="_blank">админ-панели</a>.</small>
-                            </div>
-                        {% endif %}
-                    {% else %}
-                        <div class="alert alert-info">
-                            <p class="mb-0">Пока нет сохранённых обращений. Будьте первым!</p>
-                        </div>
-                    {% endif %}
-                </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tr>
+                        <td class="w-25">Страна</td>
+                        <td>Россия</td>
+                    </tr>
+                    <tr>
+                        <td class="w-25">ИНН</td>
+                        <td>91-1144442</td>
+                    </tr>
+                    <tr>
+                        <td class="w-25">Адрес</td>
+                        <td>г. Москва, ул. Примерная, д. 123</td>
+                    </tr>
+                    <tr>
+                        <td class="w-25">Телефон</td>
+                        <td>+7 (999) 123-45-67</td>
+                    </tr>
+                    <tr>
+                        <td class="w-25">Email</td>
+                        <td>info@skystore.ru</td>
+                    </tr>
+                    <tr>
+                        <td class="w-25">Часы работы</td>
+                        <td>Пн-Пт: 9:00-20:00, Сб-Вс: 10:00-18:00</td>
+                    </tr>
+                </table>
             </div>
         </div>
 
-        <!-- Правая колонка: Форма отправки сообщения -->
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card mb-4 box-shadow">
-                <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">Свяжитесь с нами</h4>
-                </div>
-                <div class="card-body">
-                    <form method="post" action="" class="form-floating">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="name">Имя</label>
-                            <input type="text" name="name" class="form-control" id="name" placeholder="Ваше имя"
-                                   required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone">Телефон</label>
-                            <input type="text" name="phone" class="form-control" id="phone"
-                                   placeholder="Контактный телефон" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="message">Сообщение</label>
-                            <textarea type="text" name="message" class="form-control" id="message"
-                                      placeholder="Ваше сообщение" rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Отправить</button>
-                    </form>
-
-                    <!-- Сообщение об успешной отправке (если было перенаправление) -->
-                    {% if request.GET.success %}
-                    <div class="alert alert-success mt-3">
-                        Сообщение успешно отправлено и сохранено в базе данных!
-                    </div>
-                    {% endif %}
-                </div>
+        <!-- Блок с сохранёнными контактами из БД -->
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Сохранённые обращения</h4>
+                <small class="text-muted">Всего: {{ contacts|length }}</small>
             </div>
-
-            <!-- Дополнительная информация -->
-            <div class="card mb-4 box-shadow">
-                <div class="card-body">
-                    <h5>Как это работает?</h5>
-                    <p class="card-text">
-                        <small>
-                            1. Заполните форму обратной связи<br>
-                            2. Ваше сообщение сохранится в базе данных<br>
-                            3. Администратор ответит вам в рабочее время<br>
-                            4. Все обращения видны в таблице слева
-                        </small>
-                    </p>
-                </div>
+            <div class="card-body">
+                {% if contacts %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Имя</th>
+                                    <th scope="col">Телефон</th>
+                                    <th scope="col">Сообщение</th>
+                                    <th scope="col">Дата</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contact in contacts|slice:":5" %}
+                                <tr>
+                                    <td>{{ contact.name }}</td>
+                                    <td>{{ contact.phone }}</td>
+                                    <td>
+                                        <div class="contact-message">
+                                            {{ contact.message|truncatechars:100 }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="contact-date">
+                                            {{ contact.created_at|date:"d.m.Y" }}<br>
+                                            {{ contact.created_at|date:"H:i" }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if contacts|length > 5 %}
+                        <div class="alert alert-info mt-3">
+                            <small>Показано 5 из {{ contacts|length }} обращений.
+                            Все обращения доступны в <a href="/admin/catalog/contact/" target="_blank">админ-панели</a>.</small>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <p class="mb-0">Пока нет сохранённых обращений. Будьте первым!</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <footer class="pt-4 my-md-5 pt-md-5 border-top">
-        <div class="row">
-            <div class="col-12 col-md">
-                SkyStore
-                <small class="d-block mb-3 text-muted">&copy; 2024</small>
+    <!-- Правая колонка: Форма отправки сообщения -->
+    <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Свяжитесь с нами</h4>
             </div>
-            <div class="col-6 col-md">
-                <h5>Категории</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="#">Смартфоны</a></li>
-                    <li><a class="text-muted" href="#">Ноутбуки</a></li>
-                    <li><a class="text-muted" href="#">Телевизоры</a></li>
-                    <li><a class="text-muted" href="#">Аудиотехника</a></li>
-                    <li><a class="text-muted" href="#">Бытовая техника</a></li>
-                </ul>
-            </div>
-            <div class="col-6 col-md">
-                <h5>Дополнительно</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="/admin/" target="_blank">Админ-панель</a></li>
-                    <li><a class="text-muted" href="#">Мы пишем</a></li>
-                </ul>
-            </div>
-            <div class="col-6 col-md">
-                <h5>О нас</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="/contacts/">Контакты</a></li>
-                    <li><a class="text-muted" href="#">Доставка</a></li>
-                    <li><a class="text-muted" href="#">Оплата</a></li>
-                </ul>
+            <div class="card-body">
+                <form method="post" action="" class="form-floating">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name">Имя</label>
+                        <input type="text" name="name" class="form-control" id="name" placeholder="Ваше имя"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone">Телефон</label>
+                        <input type="text" name="phone" class="form-control" id="phone"
+                               placeholder="Контактный телефон" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message">Сообщение</label>
+                        <textarea type="text" name="message" class="form-control" id="message"
+                                  placeholder="Ваше сообщение" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Отправить</button>
+                </form>
+
+                <!-- Сообщение об успешной отправке (если было перенаправление) -->
+                {% if request.GET.success %}
+                <div class="alert alert-success mt-3">
+                    Сообщение успешно отправлено и сохранено в базе данных!
+                </div>
+                {% endif %}
             </div>
         </div>
-    </footer>
+
+        <!-- Дополнительная информация -->
+        <div class="card mb-4 box-shadow">
+            <div class="card-body">
+                <h5>Как это работает?</h5>
+                <p class="card-text">
+                    <small>
+                        1. Заполните форму обратной связи<br>
+                        2. Ваше сообщение сохранится в базе данных<br>
+                        3. Администратор ответит вам в рабочее время<br>
+                        4. Все обращения видны в таблице слева
+                    </small>
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
-<!-- Подключите статичеcкие файлы со скриптами Bootstrap -->
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Skystore{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+    <!-- Дополнительные стили для страницы -->
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            height: 200px;
+            object-fit: cover;
+        }
+        .product-image-sm {
+            height: 150px;
+            object-fit: cover;
+        }
+        main {
+            flex: 1;
+        }
+        footer {
+            margin-top: auto;
+            background-color: #f8f9fa;
+            padding: 20px 0;
+        }
+        .badge-category {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Подключаем подшаблон с меню -->
+    {% include 'catalog/includes/menu.html' %}
+
+    <!-- Основной контент -->
+    <main class="container py-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Подвал -->
+    <footer class="text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-4 mb-3 mb-md-0">
+                    <h5>Skystore</h5>
+                    <p class="small text-muted">Интернет-магазин электроники и техники</p>
+                </div>
+                <div class="col-12 col-md-4 mb-3 mb-md-0">
+                    <h5>Контакты</h5>
+                    <p class="small text-muted mb-0">📞 +7 (999) 123-45-67</p>
+                    <p class="small text-muted">📧 info@skystore.ru</p>
+                </div>
+                <div class="col-12 col-md-4">
+                    <h5>Мы в соцсетях</h5>
+                    <p class="small text-muted">Telegram | VK | YouTube</p>
+                </div>
+            </div>
+            <hr class="my-3">
+            <p class="small text-muted mb-0">&copy; {% now "Y" %} Skystore. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

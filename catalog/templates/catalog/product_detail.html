@@ -1,0 +1,144 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}{{ product.name }} - Skystore{% endblock %}
+
+{% block content %}
+<!-- Навигационная цепочка (breadcrumb) -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i> Главная</a></li>
+        {% if product.category %}
+        <li class="breadcrumb-item">
+            <a href="#">{{ product.category.name }}</a>
+        </li>
+        {% endif %}
+        <li class="breadcrumb-item active" aria-current="page">{{ product.name|truncatechars:30 }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- Левая колонка: изображение товара -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}" 
+                         style="width: 100%; max-height: 500px; object-fit: contain;">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" 
+                         style="height: 400px; width: 100%;">
+                        <div class="text-center">
+                            <i class="bi bi-image fs-1 d-block text-muted"></i>
+                            <span class="text-muted">Изображение отсутствует</span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Правая колонка: информация о товаре -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="card-title h2 mb-3">{{ product.name }}</h1>
+                
+                <!-- Категория и рейтинг (заглушка) -->
+                <div class="d-flex align-items-center mb-3">
+                    {% if product.category %}
+                    <span class="badge bg-primary badge-category me-2">
+                        <i class="bi bi-tag"></i> {{ product.category.name }}
+                    </span>
+                    {% endif %}
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-star-fill"></i> 4.8
+                    </span>
+                    <span class="ms-2 text-muted small">(12 отзывов)</span>
+                </div>
+                
+                <!-- Цена -->
+                <div class="mb-4">
+                    <span class="price-tag display-6">{{ product.price|floatformat:2 }} ₽</span>
+                    <span class="text-muted ms-2">с НДС</span>
+                </div>
+                
+                <!-- Описание товара -->
+                <div class="mb-4">
+                    <h5>Описание товара:</h5>
+                    <div class="p-3 bg-light rounded">
+                        {{ product.description|linebreaks|default:"Описание отсутствует" }}
+                    </div>
+                </div>
+                
+                <!-- Характеристики (заглушка) -->
+                <div class="mb-4">
+                    <h5>Характеристики:</h5>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td class="w-25">Артикул:</td>
+                            <td><strong>SKU-{{ product.pk|stringformat:"04d" }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Категория:</td>
+                            <td><strong>{{ product.category.name|default:"Без категории" }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Доступность:</td>
+                            <td><span class="badge bg-success">В наличии</span></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Информация о датах -->
+                <div class="row text-muted small border-top pt-3">
+                    <div class="col-6">
+                        <p class="mb-1"><i class="bi bi-calendar-plus"></i> Добавлен:</p>
+                        <p><i class="bi bi-calendar-check"></i> Изменен:</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1">{{ product.created_at|date:"d.m.Y H:i" }}</p>
+                        <p>{{ product.updated_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                </div>
+                
+                <!-- Кнопки действий -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary me-md-2">
+                        <i class="bi bi-arrow-left"></i> Назад
+                    </a>
+                    <button class="btn btn-success" onclick="alert('Функционал покупки в разработке')">
+                        <i class="bi bi-cart"></i> Купить сейчас
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Блок с похожими товарами (для дополнительного задания) -->
+{% if related_products %}
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="border-bottom pb-2 mb-4">Похожие товары</h3>
+    </div>
+    {% for related in related_products %}
+    <div class="col-md-3 mb-3">
+        <div class="card product-card h-100">
+            {% if related.image %}
+                <img src="{{ related.image.url }}" class="card-img-top product-image-sm" alt="{{ related.name }}">
+            {% endif %}
+            <div class="card-body">
+                <h6 class="card-title">{{ related.name|truncatechars:30 }}</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-success">{{ related.price|floatformat:0 }} ₽</span>
+                    <a href="{% url 'product_detail' related.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
