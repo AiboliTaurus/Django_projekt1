@@ -1,3 +1,4 @@
+<!-- catalog/templates/catalog/home.html - ПОЛНОСТЬЮ ОБНОВЛЕННАЯ ВЕРСИЯ -->
 {% extends 'catalog/base.html' %}
 
 {% block title %}Skystore - Главная{% endblock %}
@@ -6,6 +7,30 @@
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
     <h1 class="display-4">Skystore</h1>
     <p class="lead">Skystore - это интернет-магазин электроники и техники</p>
+
+    <!-- ИНФОРМАЦИЯ О ПОИСКЕ -->
+    {% if search_query %}
+    <div class="alert alert-info mt-3">
+        <strong>Поиск: "{{ search_query }}"</strong>
+        <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary ms-3">
+            <i class="bi bi-x-circle"></i> Сбросить поиск
+        </a>
+        <span class="ms-3 text-muted">
+            Найдено товаров: {{ page_obj.paginator.count }}
+        </span>
+    </div>
+    {% endif %}
+
+    <!-- ИНФОРМАЦИЯ О КАТЕГОРИИ -->
+    {% if current_category and not search_query %}
+    <div class="alert alert-info mt-3">
+        <strong>Категория: {{ current_category }}</strong>
+        <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary ms-3">
+            <i class="bi bi-x-circle"></i> Сбросить фильтр
+        </a>
+    </div>
+    {% endif %}
+
     <p class="text-muted">
         Всего товаров: <strong>{{ product_count }}</strong> |
         Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
@@ -62,7 +87,7 @@
         {% endfor %}
     </div>
 
-    <!-- ПАГИНАЦИЯ - добавляем этот блок -->
+    <!-- ПАГИНАЦИЯ С СОХРАНЕНИЕМ ПАРАМЕТРОВ -->
     {% if is_paginated %}
     <div class="row mt-5">
         <div class="col-12">
@@ -71,7 +96,10 @@
                     <!-- Кнопка "Первая" -->
                     {% if page_obj.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page=1" aria-label="Первая">
+                        <a class="page-link" href="?page=1
+                            {% if current_category %}&category={{ current_category }}{% endif %}
+                            {% if search_query %}&q={{ search_query }}{% endif %}"
+                           aria-label="Первая">
                             <span aria-hidden="true">&laquo;&laquo;</span>
                         </a>
                     </li>
@@ -80,7 +108,10 @@
                     <!-- Кнопка "Предыдущая" -->
                     {% if page_obj.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Предыдущая">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}
+                            {% if current_category %}&category={{ current_category }}{% endif %}
+                            {% if search_query %}&q={{ search_query }}{% endif %}"
+                           aria-label="Предыдущая">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -94,7 +125,11 @@
                             </li>
                         {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                <a class="page-link" href="?page={{ num }}
+                                    {% if current_category %}&category={{ current_category }}{% endif %}
+                                    {% if search_query %}&q={{ search_query }}{% endif %}">
+                                    {{ num }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -102,7 +137,10 @@
                     <!-- Кнопка "Следующая" -->
                     {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Следующая">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}
+                            {% if current_category %}&category={{ current_category }}{% endif %}
+                            {% if search_query %}&q={{ search_query }}{% endif %}"
+                           aria-label="Следующая">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -111,7 +149,10 @@
                     <!-- Кнопка "Последняя" -->
                     {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Последняя">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}
+                            {% if current_category %}&category={{ current_category }}{% endif %}
+                            {% if search_query %}&q={{ search_query }}{% endif %}"
+                           aria-label="Последняя">
                             <span aria-hidden="true">&raquo;&raquo;</span>
                         </a>
                     </li>
@@ -120,28 +161,52 @@
             </nav>
             <p class="text-center text-muted small mt-2">
                 Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
-                (всего товаров: {{ product_count }})
+                (всего товаров: {{ page_obj.paginator.count }})
             </p>
         </div>
     </div>
     {% endif %}
 
     {% else %}
+    <!-- СООБЩЕНИЕ, ЕСЛИ ТОВАРОВ НЕТ -->
     <div class="alert alert-warning text-center">
-        <h4 class="alert-heading">Товары отсутствуют!</h4>
-        <p>В каталоге пока нет товаров. Добавьте товары через админ-панель.</p>
+        <h4 class="alert-heading">
+            {% if search_query %}
+                Ничего не найдено по запросу "{{ search_query }}"
+            {% elif current_category %}
+                В категории "{{ current_category }}" нет товаров
+            {% else %}
+                Товары отсутствуют!
+            {% endif %}
+        </h4>
+        <p>
+            {% if search_query %}
+                Попробуйте изменить поисковый запрос
+            {% elif current_category %}
+                Добавьте товары в эту категорию через админ-панель
+            {% else %}
+                В каталоге пока нет товаров. Добавьте товары через админ-панель.
+            {% endif %}
+        </p>
         <hr>
         <a href="/admin/catalog/product/add/" class="btn btn-primary" target="_blank">
-            Добавить первый товар
+            Добавить товар
         </a>
+        {% if search_query or current_category %}
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary ms-2">
+            Сбросить фильтры
+        </a>
+        {% endif %}
     </div>
     {% endif %}
 
-    <!-- Статический блок с категориями -->
+    <!-- СТАТИЧЕСКИЙ БЛОК С КАТЕГОРИЯМИ (С РАБОЧИМИ КНОПКАМИ) -->
     <div class="row text-center mt-5">
         <div class="col-12">
             <h2 class="mb-4">Популярные категории</h2>
         </div>
+
+        <!-- Смартфоны -->
         <div class="col-lg-3 col-md-4 col-sm-6">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
@@ -150,15 +215,19 @@
                 <div class="card-body">
                     <h1 class="card-title pricing-card-title">от 20 000 ₽</h1>
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                        <li>- Apple iPhone</li>
-                        <li>- Samsung Galaxy</li>
-                        <li>- Xiaomi</li>
-                        <li>- Google Pixel</li>
+                        <li><i class="bi bi-phone text-primary me-2"></i> Apple iPhone</li>
+                        <li><i class="bi bi-phone text-primary me-2"></i> Samsung Galaxy</li>
+                        <li><i class="bi bi-phone text-primary me-2"></i> Xiaomi</li>
+                        <li><i class="bi bi-phone text-primary me-2"></i> Google Pixel</li>
                     </ul>
-                    <button type="button" class="btn btn-lg btn-block btn-outline-primary">Смотреть</button>
+                    <a href="{% url 'home' %}?category=Смартфоны" class="btn btn-lg btn-block btn-outline-primary">
+                        Смотреть
+                    </a>
                 </div>
             </div>
         </div>
+
+        <!-- Ноутбуки -->
         <div class="col-lg-3 col-md-4 col-sm-6">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
@@ -167,15 +236,19 @@
                 <div class="card-body">
                     <h1 class="card-title pricing-card-title">от 40 000 ₽</h1>
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                        <li>- Apple MacBook</li>
-                        <li>- Dell XPS</li>
-                        <li>- ASUS ROG</li>
-                        <li>- Lenovo ThinkPad</li>
+                        <li><i class="bi bi-laptop text-success me-2"></i> Apple MacBook</li>
+                        <li><i class="bi bi-laptop text-success me-2"></i> Dell XPS</li>
+                        <li><i class="bi bi-laptop text-success me-2"></i> ASUS ROG</li>
+                        <li><i class="bi bi-laptop text-success me-2"></i> Lenovo ThinkPad</li>
                     </ul>
-                    <button type="button" class="btn btn-lg btn-block btn-outline-primary">Смотреть</button>
+                    <a href="{% url 'home' %}?category=Ноутбуки" class="btn btn-lg btn-block btn-outline-primary">
+                        Смотреть
+                    </a>
                 </div>
             </div>
         </div>
+
+        <!-- Наушники -->
         <div class="col-lg-3 col-md-4 col-sm-6">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
@@ -184,15 +257,19 @@
                 <div class="card-body">
                     <h1 class="card-title pricing-card-title">от 5 000 ₽</h1>
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                        <li>- Apple AirPods</li>
-                        <li>- Sony WH-1000XM</li>
-                        <li>- Samsung Galaxy Buds</li>
-                        <li>- Marshall</li>
+                        <li><i class="bi bi-headphones text-warning me-2"></i> Apple AirPods</li>
+                        <li><i class="bi bi-headphones text-warning me-2"></i> Sony WH-1000XM</li>
+                        <li><i class="bi bi-headphones text-warning me-2"></i> Samsung Galaxy Buds</li>
+                        <li><i class="bi bi-headphones text-warning me-2"></i> Marshall</li>
                     </ul>
-                    <button type="button" class="btn btn-lg btn-block btn-outline-primary">Смотреть</button>
+                    <a href="{% url 'home' %}?category=Наушники" class="btn btn-lg btn-block btn-outline-primary">
+                        Смотреть
+                    </a>
                 </div>
             </div>
         </div>
+
+        <!-- Телевизоры -->
         <div class="col-lg-3 col-md-4 col-sm-6">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
@@ -201,12 +278,14 @@
                 <div class="card-body">
                     <h1 class="card-title pricing-card-title">от 30 000 ₽</h1>
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                        <li>- LG OLED</li>
-                        <li>- Samsung QLED</li>
-                        <li>- Sony Bravia</li>
-                        <li>- Xiaomi TV</li>
+                        <li><i class="bi bi-tv text-danger me-2"></i> LG OLED</li>
+                        <li><i class="bi bi-tv text-danger me-2"></i> Samsung QLED</li>
+                        <li><i class="bi bi-tv text-danger me-2"></i> Sony Bravia</li>
+                        <li><i class="bi bi-tv text-danger me-2"></i> Xiaomi TV</li>
                     </ul>
-                    <button type="button" class="btn btn-lg btn-block btn-outline-primary">Смотреть</button>
+                    <a href="{% url 'home' %}?category=Телевизоры" class="btn btn-lg btn-block btn-outline-primary">
+                        Смотреть
+                    </a>
                 </div>
             </div>
         </div>

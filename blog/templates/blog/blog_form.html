@@ -1,0 +1,60 @@
+<!-- blog/templates/blog/blog_form.html - УПРОЩЁННАЯ РАБОЧАЯ ВЕРСИЯ -->
+{% extends 'catalog/base.html' %}
+
+{% block title %}
+    {% if object %}
+        Редактирование: {{ object.title }}
+    {% else %}
+        Новая статья
+    {% endif %} - Блог Skystore
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    {% if object %}
+                        <i class="bi bi-pencil"></i> Редактирование статьи
+                    {% else %}
+                        <i class="bi bi-plus-circle"></i> Создание новой статьи
+                    {% endif %}
+                </h4>
+            </div>
+
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Исправьте следующие ошибки:</strong>
+                        {{ form.errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- ИСПОЛЬЗУЕМ ГОТОВЫЙ РЕНДЕРИНГ DJANGO -->
+                    {{ form.as_p }}
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'blog:blog_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i>
+                            {% if object %}
+                                Сохранить изменения
+                            {% else %}
+                                Опубликовать статью
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

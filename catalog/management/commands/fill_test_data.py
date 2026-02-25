@@ -1,7 +1,7 @@
+# catalog/management/commands/fill_test_data.py
 from django.core.management.base import BaseCommand
 from catalog.models import Category, Product, Contact
 from decimal import Decimal
-import os
 
 
 class Command(BaseCommand):
@@ -31,7 +31,7 @@ class Command(BaseCommand):
                 'description': 'Телевизоры и медиатехника'
             },
             {
-                'name': 'Аудиотехника',
+                'name': 'Наушники',  # ЭТА КАТЕГОРИЯ УЖЕ ЕСТЬ
                 'description': 'Наушники, колонки, аудиосистемы'
             },
             {
@@ -46,8 +46,9 @@ class Command(BaseCommand):
             created_categories[cat_data['name']] = category
             self.stdout.write(f'✓ Создана категория: {category.name}')
 
-        # 3. Создаем товары
+        # 3. Создаем товары (ДОБАВЛЯЕМ ТОВАРЫ ДЛЯ НАУШНИКОВ)
         products = [
+            # Смартфоны
             {
                 'name': 'iPhone 15 Pro Max',
                 'description': 'Флагманский смартфон Apple с динамическим островом',
@@ -60,12 +61,7 @@ class Command(BaseCommand):
                 'category': created_categories['Смартфоны'],
                 'price': Decimal('119999.00')
             },
-            {
-                'name': 'Xiaomi 14 Pro',
-                'description': 'Флагманский смартфон с камерой Leica',
-                'category': created_categories['Смартфоны'],
-                'price': Decimal('79999.00')
-            },
+            # Ноутбуки
             {
                 'name': 'MacBook Pro 16" M3 Max',
                 'description': 'Ноутбук Apple для профессиональной работы',
@@ -78,6 +74,7 @@ class Command(BaseCommand):
                 'category': created_categories['Ноутбуки'],
                 'price': Decimal('219999.00')
             },
+            # Телевизоры
             {
                 'name': 'LG OLED C3',
                 'description': '4K OLED телевизор с технологией AI Processor',
@@ -90,18 +87,32 @@ class Command(BaseCommand):
                 'category': created_categories['Телевизоры'],
                 'price': Decimal('89999.00')
             },
-            {
-                'name': 'Sony WH-1000XM5',
-                'description': 'Беспроводные наушники с шумоподавлением',
-                'category': created_categories['Аудиотехника'],
-                'price': Decimal('29999.00')
-            },
+            # НАУШНИКИ (НОВЫЕ ТОВАРЫ)
             {
                 'name': 'Apple AirPods Pro 2',
-                'description': 'Беспроводные наушники с активным шумоподавлением',
-                'category': created_categories['Аудиотехника'],
-                'price': Decimal('24999.00')
+                'description': 'Беспроводные наушники с активным шумоподавлением, чип H2',
+                'category': created_categories['Наушники'],
+                'price': Decimal('24990.00')
             },
+            {
+                'name': 'Sony WH-1000XM5',
+                'description': 'Премиальные беспроводные наушники с шумоподавлением',
+                'category': created_categories['Наушники'],
+                'price': Decimal('29990.00')
+            },
+            {
+                'name': 'Samsung Galaxy Buds2 Pro',
+                'description': 'Компактные беспроводные наушники с 24-бит звуком',
+                'category': created_categories['Наушники'],
+                'price': Decimal('15990.00')
+            },
+            {
+                'name': 'Marshall Major IV',
+                'description': 'Наушники с фирменным звуком Marshall и 80+ часами работы',
+                'category': created_categories['Наушники'],
+                'price': Decimal('12990.00')
+            },
+            # Бытовая техника
             {
                 'name': 'Dyson V15 Detect',
                 'description': 'Пылесос с лазерной системой обнаружения пыли',
@@ -114,45 +125,6 @@ class Command(BaseCommand):
             product = Product.objects.create(**prod_data)
             self.stdout.write(f'✓ Создан товар: {product.name} - {product.price} руб.')
 
-        # 4. Создаем контакты
-        contacts = [
-            {
-                'name': 'Александр Иванов',
-                'phone': '+7 (999) 111-22-33',
-                'message': 'Интересует наличие iPhone 15 в синем цвете'
-            },
-            {
-                'name': 'Мария Петрова',
-                'phone': '+7 (999) 222-33-44',
-                'message': 'Есть ли доставка в Санкт-Петербург?'
-            },
-            {
-                'name': 'Дмитрий Сидоров',
-                'phone': '+7 (999) 333-44-55',
-                'message': 'Нужна консультация по выбору игрового ноутбука'
-            },
-        ]
-
-        for contact_data in contacts:
-            contact = Contact.objects.create(**contact_data)
-            self.stdout.write(f'✓ Создан контакт: {contact.name} - {contact.phone}')
-
-        # 5. Выводим статистику
         self.stdout.write(self.style.SUCCESS('\n' + '=' * 50))
         self.stdout.write(self.style.SUCCESS('БАЗА ДАННЫХ УСПЕШНО ЗАПОЛНЕНА!'))
         self.stdout.write(self.style.SUCCESS('=' * 50))
-
-        stats = f"""
-        📊 Статистика Skystore:
-        -------------------------
-        Категорий: {Category.objects.count()}
-        Товаров: {Product.objects.count()}
-        Контактов: {Contact.objects.count()}
-        -------------------------
-        """
-        self.stdout.write(stats)
-
-        # 6. Альтернативный вариант: загрузка из фикстур
-        # from django.core.management import call_command
-        # self.stdout.write('\nАльтернатива: загружаем данные из фикстур...')
-        # call_command('loaddata', 'fixtures/all_catalog_data.json')
