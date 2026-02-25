@@ -1,0 +1,99 @@
+<!-- blog/templates/blog/blog_list.html -->
+{% extends 'catalog/base.html' %}
+
+{% block title %}Блог - Skystore{% endblock %}
+
+{% block content %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Блог Skystore</h1>
+    <p class="lead">Полезные статьи о технике, обзоры и новости</p>
+    <p class="text-muted">
+        Всего статей: <strong>{{ page_obj.paginator.count }}</strong>
+    </p>
+
+    <!-- Кнопка добавления статьи (для демонстрации) -->
+    <a href="{% url 'blog:blog_create' %}" class="btn btn-primary mt-3">
+        <i class="bi bi-plus-circle"></i> Написать статью
+    </a>
+</div>
+
+<div class="container">
+    {% if posts %}
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if post.preview %}
+                <img src="{{ post.preview.url }}" class="card-img-top" alt="{{ post.title }}"
+                     style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
+                     style="height: 200px;">
+                    <i class="bi bi-image fs-1"></i>
+                </div>
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.title|truncatechars:50 }}</h5>
+                    <p class="card-text text-muted small">
+                        {{ post.created_at|date:"d.m.Y" }} •
+                        <i class="bi bi-eye"></i> {{ post.views_count }}
+                    </p>
+                    <p class="card-text">{{ post.content|truncatechars:100 }}</p>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'blog:blog_detail' post.pk %}" class="btn btn-outline-primary">
+                            Читать далее
+                        </a>
+                        <div>
+                            <a href="{% url 'blog:blog_edit' post.pk %}" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'blog:blog_delete' post.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info text-center">
+        <h4 class="alert-heading">Статьи отсутствуют!</h4>
+        <p>В блоге пока нет статей. Будьте первым, кто опубликует статью!</p>
+        <hr>
+        <a href="{% url 'blog:blog_create' %}" class="btn btn-primary">
+            Написать первую статью
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
