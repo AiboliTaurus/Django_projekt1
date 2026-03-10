@@ -1,10 +1,10 @@
-<!-- catalog/templates/catalog/includes/menu.html - ПОЛНОСТЬЮ ОБНОВЛЕННАЯ ВЕРСИЯ -->
+<!-- catalog/templates/catalog/includes/menu.html - ИСПРАВЛЕННАЯ ВЕРСИЯ -->
 {% load static %}
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <!-- Логотип и название магазина -->
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'catalog:home' %}">  <!-- ✅ ИСПРАВЛЕНО -->
             <span class="fs-3 me-2">🛒</span>
             <span class="fw-bold">Skystore</span>
         </a>
@@ -20,7 +20,7 @@
                 <!-- Главная -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/' %}active{% endif %}"
-                       href="{% url 'home' %}">
+                       href="{% url 'catalog:home' %}">  <!-- ✅ ИСПРАВЛЕНО -->
                         <i class="bi bi-house-door"></i> Главная
                     </a>
                 </li>
@@ -28,7 +28,7 @@
                 <!-- Блог -->
                 <li class="nav-item">
                     <a class="nav-link {% if '/blogs/' in request.path %}active{% endif %}"
-                       href="{% url 'blog:blog_list' %}">
+                       href="{% url 'blog:blog_list' %}">  <!-- ✅ ЭТО ПРАВИЛЬНО (blog:) -->
                         <i class="bi bi-newspaper"></i> Блог
                     </a>
                 </li>
@@ -36,7 +36,7 @@
                 <!-- Контакты -->
                 <li class="nav-item">
                     <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}"
-                       href="{% url 'contacts' %}">
+                       href="{% url 'catalog:contacts' %}">  <!-- ✅ ИСПРАВЛЕНО -->
                         <i class="bi bi-envelope"></i> Контакты
                     </a>
                 </li>
@@ -50,7 +50,7 @@
                     <ul class="dropdown-menu">
                         {% for category in categories %}
                         <li>
-                            <a class="dropdown-item" href="{% url 'home' %}?category={{ category.name }}">{{ category.name }}</a>
+                            <a class="dropdown-item" href="{% url 'catalog:home' %}?category={{ category.name }}">{{ category.name }}</a>  <!-- ✅ ИСПРАВЛЕНО -->
                         </li>
                         {% endfor %}
                     </ul>
@@ -63,7 +63,7 @@
                 <!-- Добавить товар -->
                 <li class="nav-item">
                     <a class="nav-link {% if '/product/create/' in request.path %}active{% endif %}"
-                       href="{% url 'product_create' %}">
+                       href="{% url 'catalog:product_create' %}">  <!-- ✅ ИСПРАВЛЕНО -->
                         <i class="bi bi-plus-circle"></i> Добавить товар
                     </a>
                 </li>
@@ -77,7 +77,7 @@
 
                 <!-- РАБОЧИЙ ПОИСК -->
                 <li class="nav-item">
-                    <form class="d-flex" role="search" method="get" action="{% url 'home' %}">
+                    <form class="d-flex" role="search" method="get" action="{% url 'catalog:home' %}">  <!-- ✅ ИСПРАВЛЕНО -->
                         <input class="form-control form-control-sm me-2" type="search"
                                name="q" placeholder="Поиск товаров..."
                                value="{{ request.GET.q|default:'' }}">
