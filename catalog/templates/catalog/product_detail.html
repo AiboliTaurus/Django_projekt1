@@ -6,7 +6,7 @@
 <!-- Навигационная цепочка (breadcrumb) -->
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i> Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}"><i class="bi bi-house"></i> Главная</a></li>  <!-- ✅ ИСПРАВЛЕНО -->
         {% if product.category %}
         <li class="breadcrumb-item">
             <a href="#">{{ product.category.name }}</a>
@@ -16,16 +16,26 @@
     </ol>
 </nav>
 
+<!-- Вывод сообщений (для уведомлений после редактирования/удаления) -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
 <div class="row">
     <!-- Левая колонка: изображение товара -->
     <div class="col-lg-6 mb-4">
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 {% if product.image %}
-                    <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}" 
+                    <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}"
                          style="width: 100%; max-height: 500px; object-fit: contain;">
                 {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center" 
+                    <div class="bg-light d-flex align-items-center justify-content-center"
                          style="height: 400px; width: 100%;">
                         <div class="text-center">
                             <i class="bi bi-image fs-1 d-block text-muted"></i>
@@ -36,13 +46,13 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Правая колонка: информация о товаре -->
     <div class="col-lg-6">
         <div class="card shadow-sm">
             <div class="card-body">
                 <h1 class="card-title h2 mb-3">{{ product.name }}</h1>
-                
+
                 <!-- Категория и рейтинг (заглушка) -->
                 <div class="d-flex align-items-center mb-3">
                     {% if product.category %}
@@ -55,13 +65,13 @@
                     </span>
                     <span class="ms-2 text-muted small">(12 отзывов)</span>
                 </div>
-                
+
                 <!-- Цена -->
                 <div class="mb-4">
                     <span class="price-tag display-6">{{ product.price|floatformat:2 }} ₽</span>
                     <span class="text-muted ms-2">с НДС</span>
                 </div>
-                
+
                 <!-- Описание товара -->
                 <div class="mb-4">
                     <h5>Описание товара:</h5>
@@ -69,7 +79,7 @@
                         {{ product.description|linebreaks|default:"Описание отсутствует" }}
                     </div>
                 </div>
-                
+
                 <!-- Характеристики (заглушка) -->
                 <div class="mb-4">
                     <h5>Характеристики:</h5>
@@ -88,7 +98,7 @@
                         </tr>
                     </table>
                 </div>
-                
+
                 <!-- Информация о датах -->
                 <div class="row text-muted small border-top pt-3">
                     <div class="col-6">
@@ -100,12 +110,21 @@
                         <p>{{ product.updated_at|date:"d.m.Y H:i" }}</p>
                     </div>
                 </div>
-                
+
                 <!-- Кнопки действий -->
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                    <a href="{% url 'home' %}" class="btn btn-outline-secondary me-md-2">
+                    <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary me-md-2">  <!-- ✅ ИСПРАВЛЕНО -->
                         <i class="bi bi-arrow-left"></i> Назад
                     </a>
+
+                    <!-- КНОПКИ для редактирования и удаления -->
+                    <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">  <!-- ✅ ИСПРАВЛЕНО -->
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
+                    <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">  <!-- ✅ ИСПРАВЛЕНО -->
+                        <i class="bi bi-trash"></i> Удалить
+                    </a>
+
                     <button class="btn btn-success" onclick="alert('Функционал покупки в разработке')">
                         <i class="bi bi-cart"></i> Купить сейчас
                     </button>
@@ -115,7 +134,7 @@
     </div>
 </div>
 
-<!-- Блок с похожими товарами (для дополнительного задания) -->
+<!-- Блок с похожими товарами -->
 {% if related_products %}
 <div class="row mt-5">
     <div class="col-12">
@@ -131,7 +150,7 @@
                 <h6 class="card-title">{{ related.name|truncatechars:30 }}</h6>
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="fw-bold text-success">{{ related.price|floatformat:0 }} ₽</span>
-                    <a href="{% url 'product_detail' related.pk %}" class="btn btn-sm btn-outline-primary">
+                    <a href="{% url 'catalog:product_detail' related.pk %}" class="btn btn-sm btn-outline-primary">  <!-- ✅ ИСПРАВЛЕНО -->
                         <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
