@@ -1,10 +1,10 @@
-# catalog/views.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# catalog/views.py - С LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.shortcuts import get_object_or_404, redirect
-from django.core.paginator import Paginator
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db import models  # ВАЖНО: добавляем для поиска
+from django.db import models
+from django.shortcuts import redirect
 
 from .models import Product, Contact, Category
 from .forms import ProductForm
@@ -58,7 +58,7 @@ class HomeView(ListView):
 
 
 class ProductDetailView(DetailView):
-    """Детальная страница товара"""
+    """Детальная страница товара - ОБЩЕДОСТУПНА"""
     model = Product
     template_name = 'catalog/product_detail.html'
     context_object_name = 'product'
@@ -78,18 +78,19 @@ class ProductDetailView(DetailView):
         return context
 
 
-class ProductCreateView(CreateView):
-    """Страница добавления нового товара"""
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    """Страница добавления нового товара - ТОЛЬКО ДЛЯ АВТОРИЗОВАННЫХ"""
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
-    success_url = reverse_lazy('catalog:home')  # ✅ ИСПРАВЛЕНО: добавлен namespace
+    success_url = reverse_lazy('catalog:home')
+    login_url = 'users:login'  # Куда перенаправлять неавторизованных
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Добавление товара - Skystore'
         context['categories'] = Category.objects.all()
-        context['is_update'] = False  # Для шаблона
+        context['is_update'] = False
         return context
 
     def form_valid(self, form):
@@ -104,23 +105,24 @@ class ProductCreateView(CreateView):
         return super().form_invalid(form)
 
 
-class ProductUpdateView(UpdateView):
-    """Страница редактирования товара"""
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
+    """Страница редактирования товара - ТОЛЬКО ДЛЯ АВТОРИЗОВАННЫХ"""
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
+    login_url = 'users:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = f'Редактирование: {self.object.name} - Skystore'
         context['categories'] = Category.objects.all()
-        context['is_update'] = True  # Для шаблона
+        context['is_update'] = True
         return context
 
     def get_success_url(self):
         """Перенаправляем на страницу товара после редактирования"""
         messages.success(self.request, f'Товар "{self.object.name}" успешно обновлён!')
-        return reverse_lazy('catalog:product_detail', kwargs={'pk': self.object.pk})  # ✅ ИСПРАВЛЕНО
+        return reverse_lazy('catalog:product_detail', kwargs={'pk': self.object.pk})
 
     def form_invalid(self, form):
         """Логика при невалидной форме"""
@@ -128,11 +130,12 @@ class ProductUpdateView(UpdateView):
         return super().form_invalid(form)
 
 
-class ProductDeleteView(DeleteView):
-    """Страница подтверждения удаления товара"""
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
+    """Страница подтверждения удаления товара - ТОЛЬКО ДЛЯ АВТОРИЗОВАННЫХ"""
     model = Product
     template_name = 'catalog/product_confirm_delete.html'
-    success_url = reverse_lazy('catalog:home')  # ✅ ИСПРАВЛЕНО: добавлен namespace
+    success_url = reverse_lazy('catalog:home')
+    login_url = 'users:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -164,8 +167,6 @@ class ContactsView(TemplateView):
         phone = request.POST.get('phone')
         message = request.POST.get('message')
 
-        print(f'Сообщение от {name} ({phone}): {message}')
-
         if name and phone and message:
             Contact.objects.create(
                 name=name,
@@ -173,4 +174,4 @@ class ContactsView(TemplateView):
                 message=message
             )
 
-        return redirect(f'{reverse_lazy("catalog:contacts")}?success=true')  # ✅ ИСПРАВЛЕНО
+        return redirect(f'{reverse_lazy("catalog:contacts")}?success=true')
