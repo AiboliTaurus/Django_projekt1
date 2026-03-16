@@ -1,10 +1,10 @@
-<!-- catalog/templates/catalog/includes/menu.html - ИСПРАВЛЕННАЯ ВЕРСИЯ -->
+<!-- catalog/templates/catalog/includes/menu.html  -->
 {% load static %}
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <!-- Логотип и название магазина -->
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'catalog:home' %}">  <!-- ✅ ИСПРАВЛЕНО -->
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'catalog:home' %}">
             <span class="fs-3 me-2">🛒</span>
             <span class="fw-bold">Skystore</span>
         </a>
@@ -20,7 +20,7 @@
                 <!-- Главная -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/' %}active{% endif %}"
-                       href="{% url 'catalog:home' %}">  <!-- ✅ ИСПРАВЛЕНО -->
+                       href="{% url 'catalog:home' %}">
                         <i class="bi bi-house-door"></i> Главная
                     </a>
                 </li>
@@ -28,7 +28,7 @@
                 <!-- Блог -->
                 <li class="nav-item">
                     <a class="nav-link {% if '/blogs/' in request.path %}active{% endif %}"
-                       href="{% url 'blog:blog_list' %}">  <!-- ✅ ЭТО ПРАВИЛЬНО (blog:) -->
+                       href="{% url 'blog:blog_list' %}">
                         <i class="bi bi-newspaper"></i> Блог
                     </a>
                 </li>
@@ -36,7 +36,7 @@
                 <!-- Контакты -->
                 <li class="nav-item">
                     <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}"
-                       href="{% url 'catalog:contacts' %}">  <!-- ✅ ИСПРАВЛЕНО -->
+                       href="{% url 'catalog:contacts' %}">
                         <i class="bi bi-envelope"></i> Контакты
                     </a>
                 </li>
@@ -50,7 +50,9 @@
                     <ul class="dropdown-menu">
                         {% for category in categories %}
                         <li>
-                            <a class="dropdown-item" href="{% url 'catalog:home' %}?category={{ category.name }}">{{ category.name }}</a>  <!-- ✅ ИСПРАВЛЕНО -->
+                            <a class="dropdown-item" href="{% url 'catalog:home' %}?category={{ category.name }}">
+                                {{ category.name }}
+                            </a>
                         </li>
                         {% endfor %}
                     </ul>
@@ -60,24 +62,28 @@
 
             <!-- Правая часть меню -->
             <ul class="navbar-nav">
-                <!-- Добавить товар -->
+                <!-- Добавить товар (доступно только авторизованным) -->
+                {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link {% if '/product/create/' in request.path %}active{% endif %}"
-                       href="{% url 'catalog:product_create' %}">  <!-- ✅ ИСПРАВЛЕНО -->
+                       href="{% url 'catalog:product_create' %}">
                         <i class="bi bi-plus-circle"></i> Добавить товар
                     </a>
                 </li>
+                {% endif %}
 
-                <!-- Админка -->
+                <!-- Админка (доступно только персоналу) -->
+                {% if user.is_staff %}
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/" target="_blank">
                         <i class="bi bi-gear"></i> Админка
                     </a>
                 </li>
+                {% endif %}
 
-                <!-- РАБОЧИЙ ПОИСК -->
+                <!-- Поиск -->
                 <li class="nav-item">
-                    <form class="d-flex" role="search" method="get" action="{% url 'catalog:home' %}">  <!-- ✅ ИСПРАВЛЕНО -->
+                    <form class="d-flex" role="search" method="get" action="{% url 'catalog:home' %}">
                         <input class="form-control form-control-sm me-2" type="search"
                                name="q" placeholder="Поиск товаров..."
                                value="{{ request.GET.q|default:'' }}">
@@ -86,12 +92,54 @@
                         </button>
                     </form>
                 </li>
+
+                <!-- БЛОК АВТОРИЗАЦИИ -->
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" class="rounded-circle me-1"
+                                 style="width: 25px; height: 25px; object-fit: cover;" alt="Avatar">
+                        {% else %}
+                            <i class="bi bi-person-circle me-1"></i>
+                        {% endif %}
+                        {{ user.email|truncatechars:20 }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'users:profile' user.pk %}">
+                                <i class="bi bi-person-gear"></i> Профиль
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'users:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="bi bi-box-arrow-right"></i> Выйти
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:login' %}">
+                        <i class="bi bi-box-arrow-in-right"></i> Вход
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:register' %}">
+                        <i class="bi bi-person-plus"></i> Регистрация
+                    </a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
 
-<!-- Bootstrap Icons (локально или CDN) -->
+<!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <style>
@@ -102,5 +150,9 @@
     }
     .dropdown-menu .dropdown-item:hover {
         background-color: #f8f9fa;
+    }
+    .navbar-nav .nav-link.d-flex {
+        display: flex;
+        align-items: center;
     }
 </style>
