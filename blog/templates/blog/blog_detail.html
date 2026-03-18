@@ -1,4 +1,5 @@
 <!-- blog/templates/blog/blog_detail.html -->
+
 {% extends 'catalog/base.html' %}
 
 {% block title %}{{ post.title }} - Блог Skystore{% endblock %}
@@ -11,6 +12,13 @@
         <li class="breadcrumb-item active">{{ post.title|truncatechars:30 }}</li>
     </ol>
 </nav>
+
+<!-- Статус публикации (для контент-менеджеров) -->
+{% if not post.is_published %}
+    <div class="alert alert-warning mb-3">
+        <i class="bi bi-eye-slash"></i> Эта статья не опубликована. Видна только контент-менеджерам.
+    </div>
+{% endif %}
 
 <div class="row">
     <div class="col-lg-8 mx-auto">
@@ -42,13 +50,30 @@
                         <i class="bi bi-arrow-left"></i> К списку статей
                     </a>
 
-                    <div>
-                        <a href="{% url 'blog:blog_edit' post.pk %}" class="btn btn-warning">
-                            <i class="bi bi-pencil"></i> Редактировать
-                        </a>
-                        <a href="{% url 'blog:blog_delete' post.pk %}" class="btn btn-danger">
-                            <i class="bi bi-trash"></i> Удалить
-                        </a>
+                    <div class="d-flex gap-2">
+                        <!-- ✅ Кнопка публикации (только для контент-менеджеров) -->
+                        {% if perms.blog.can_publish_blogpost and not post.is_published %}
+                            <form method="post" action="{% url 'blog:blog_publish' post.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Опубликовать
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        <!-- Кнопка редактирования (только для контент-менеджеров) -->
+                        {% if perms.blog.change_blogpost %}
+                            <a href="{% url 'blog:blog_edit' post.pk %}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Редактировать
+                            </a>
+                        {% endif %}
+
+                        <!-- Кнопка удаления (только для контент-менеджеров) -->
+                        {% if perms.blog.delete_blogpost %}
+                            <a href="{% url 'blog:blog_delete' post.pk %}" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Удалить
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
