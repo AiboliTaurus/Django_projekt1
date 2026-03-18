@@ -41,9 +41,13 @@ class BlogPost(models.Model):
         verbose_name_plural = 'Блоговые записи'
         ordering = ['-created_at']
 
+        permissions = [
+            ('can_manage_blog', 'Может управлять публикациями в блоге'),
+            ('can_publish_blogpost', 'Может публиковать статьи'),
+        ]
+
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
-        """Возвращает URL для детального просмотра статьи"""
-        return reverse('blog:blogpost_detail', kwargs={'pk': self.pk})
+        return reverse('blog:blog_detail', kwargs={'pk': self.pk})
