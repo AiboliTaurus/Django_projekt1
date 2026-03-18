@@ -19,4 +19,7 @@ urlpatterns = [
 
     # Удаление статьи
     path('<int:pk>/delete/', views.BlogPostDeleteView.as_view(), name='blog_delete'),
+
+    # Публикация в блоге
+    path('<int:pk>/publish/', views.BlogPostPublishView.as_view(), name='blog_publish'),
 ]
