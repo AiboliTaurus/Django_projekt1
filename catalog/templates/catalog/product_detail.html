@@ -1,3 +1,5 @@
+<!-- catalog/templates/catalog/product_detail.html -->
+
 {% extends 'catalog/base.html' %}
 
 {% block title %}{{ product.name }} - Skystore{% endblock %}
@@ -6,7 +8,7 @@
 <!-- Навигационная цепочка (breadcrumb) -->
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}"><i class="bi bi-house"></i> Главная</a></li>  <!-- ✅ ИСПРАВЛЕНО -->
+        <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}"><i class="bi bi-house"></i> Главная</a></li>
         {% if product.category %}
         <li class="breadcrumb-item">
             <a href="#">{{ product.category.name }}</a>
@@ -24,6 +26,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     {% endfor %}
+{% endif %}
+
+<!-- Статус публикации (для модераторов и владельцев) -->
+{% if not product.is_published %}
+    <div class="alert alert-warning mb-3">
+        <i class="bi bi-eye-slash"></i> Этот товар не опубликован. Виден только владельцу и модераторам.
+    </div>
 {% endif %}
 
 <div class="row">
@@ -53,17 +62,31 @@
             <div class="card-body">
                 <h1 class="card-title h2 mb-3">{{ product.name }}</h1>
 
-                <!-- Категория и рейтинг (заглушка) -->
+                <!-- Категория и статус -->
                 <div class="d-flex align-items-center mb-3">
                     {% if product.category %}
-                    <span class="badge bg-primary badge-category me-2">
-                        <i class="bi bi-tag"></i> {{ product.category.name }}
-                    </span>
+                        <span class="badge bg-primary badge-category me-2">
+                            <i class="bi bi-tag"></i> {{ product.category.name }}
+                        </span>
                     {% endif %}
-                    <span class="badge bg-warning text-dark">
-                        <i class="bi bi-star-fill"></i> 4.8
-                    </span>
-                    <span class="ms-2 text-muted small">(12 отзывов)</span>
+
+                    <!-- Статус публикации -->
+                    {% if product.is_published %}
+                        <span class="badge bg-success me-2">
+                            <i class="bi bi-check-circle"></i> Опубликовано
+                        </span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark me-2">
+                            <i class="bi bi-exclamation-triangle"></i> Не опубликовано
+                        </span>
+                    {% endif %}
+
+                    <!-- Информация о владельце -->
+                    {% if product.owner %}
+                        <span class="ms-2 text-muted small">
+                            <i class="bi bi-person"></i> {{ product.owner.email }}
+                        </span>
+                    {% endif %}
                 </div>
 
                 <!-- Цена -->
@@ -80,7 +103,7 @@
                     </div>
                 </div>
 
-                <!-- Характеристики (заглушка) -->
+                <!-- Характеристики -->
                 <div class="mb-4">
                     <h5>Характеристики:</h5>
                     <table class="table table-sm table-borderless">
@@ -91,6 +114,10 @@
                         <tr>
                             <td>Категория:</td>
                             <td><strong>{{ product.category.name|default:"Без категории" }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Владелец:</td>
+                            <td><strong>{{ product.owner.email|default:"Не указан" }}</strong></td>
                         </tr>
                         <tr>
                             <td>Доступность:</td>
@@ -113,17 +140,34 @@
 
                 <!-- Кнопки действий -->
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                    <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary me-md-2">  <!-- ✅ ИСПРАВЛЕНО -->
+                    <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary me-md-2">
                         <i class="bi bi-arrow-left"></i> Назад
                     </a>
 
-                    <!-- КНОПКИ для редактирования и удаления -->
-                    <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">  <!-- ✅ ИСПРАВЛЕНО -->
-                        <i class="bi bi-pencil"></i> Редактировать
-                    </a>
-                    <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">  <!-- ✅ ИСПРАВЛЕНО -->
-                        <i class="bi bi-trash"></i> Удалить
-                    </a>
+                    <!-- Кнопка редактирования (только для владельца или модератора) -->
+                    {% if user == product.owner or perms.catalog.can_unpublish_product %}
+                        <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Редактировать
+                        </a>
+                    {% endif %}
+
+                    <!-- Кнопка отмены публикации (только для модераторов) -->
+                    {% if perms.catalog.can_unpublish_product and product.is_published %}
+                        <form method="post" action="{% url 'catalog:product_unpublish' product.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary"
+                                    onclick="return confirm('Отменить публикацию товара?')">
+                                <i class="bi bi-eye-slash"></i> Снять с публикации
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    <!-- Кнопка удаления (владелец или модератор с правом удаления) -->
+                    {% if user == product.owner or perms.catalog.delete_product or perms.catalog.can_delete_any_product %}
+                        <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Удалить
+                        </a>
+                    {% endif %}
 
                     <button class="btn btn-success" onclick="alert('Функционал покупки в разработке')">
                         <i class="bi bi-cart"></i> Купить сейчас
@@ -136,28 +180,28 @@
 
 <!-- Блок с похожими товарами -->
 {% if related_products %}
-<div class="row mt-5">
-    <div class="col-12">
-        <h3 class="border-bottom pb-2 mb-4">Похожие товары</h3>
-    </div>
-    {% for related in related_products %}
-    <div class="col-md-3 mb-3">
-        <div class="card product-card h-100">
-            {% if related.image %}
-                <img src="{{ related.image.url }}" class="card-img-top product-image-sm" alt="{{ related.name }}">
-            {% endif %}
-            <div class="card-body">
-                <h6 class="card-title">{{ related.name|truncatechars:30 }}</h6>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold text-success">{{ related.price|floatformat:0 }} ₽</span>
-                    <a href="{% url 'catalog:product_detail' related.pk %}" class="btn btn-sm btn-outline-primary">  <!-- ✅ ИСПРАВЛЕНО -->
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="border-bottom pb-2 mb-4">Похожие товары</h3>
+        </div>
+        {% for related in related_products %}
+            <div class="col-md-3 mb-3">
+                <div class="card product-card h-100">
+                    {% if related.image %}
+                        <img src="{{ related.image.url }}" class="card-img-top product-image-sm" alt="{{ related.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title">{{ related.name|truncatechars:30 }}</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success">{{ related.price|floatformat:0 }} ₽</span>
+                            <a href="{% url 'catalog:product_detail' related.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 {% endif %}
 {% endblock %}
