@@ -1,6 +1,8 @@
+# catalog/models.py
 from django.db import models
+from django.conf import settings
 
-# Create your models here.
+
 class Category(models.Model):
     """Модель категории товаров для магазина Skystore"""
     name = models.CharField(
@@ -68,10 +70,34 @@ class Product(models.Model):
         verbose_name='Дата последнего изменения'
     )
 
+    # Статус публикации (для модерации)
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name='Опубликовано',
+        help_text='Отметьте, чтобы опубликовать товар'
+    )
+
+    # Владелец продукта (ForeignKey на пользователя)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name='Владелец',
+        related_name='products',
+        null=True,
+        blank=True,
+        help_text='Владелец товара'
+    )
+
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
         ordering = ['name', '-created_at']
+
+        # КАСТОМНЫЕ ПРАВА
+        permissions = [
+            ('can_unpublish_product', 'Может отменять публикацию продукта'),
+            ('can_delete_any_product', 'Может удалять любой продукт'),
+        ]
 
     def __str__(self):
         return f'{self.name} - {self.price} руб.'
