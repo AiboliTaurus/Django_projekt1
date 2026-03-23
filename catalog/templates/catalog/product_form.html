@@ -1,3 +1,5 @@
+<!-- catalog/templates/catalog/product_form.html -->
+
 {% extends 'catalog/base.html' %}
 
 {% block title %}{{ title }}{% endblock %}
@@ -154,6 +156,26 @@
                             </div>
                         {% endif %}
                     </div>
+
+                    <!-- Поле "Опубликовано" (только для модераторов при редактировании) -->
+                    {% if perms.catalog.can_unpublish_product and is_update %}
+                    <div class="mb-3 form-check">
+                        {{ form.is_published }}
+                        <label for="{{ form.is_published.id_for_label }}" class="form-check-label">
+                            {{ form.is_published.label }}
+                        </label>
+                        {% if form.is_published.help_text %}
+                            <div class="form-text text-muted">{{ form.is_published.help_text }}</div>
+                        {% endif %}
+                        {% if form.is_published.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.is_published.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
 
                     <hr class="my-4">
 

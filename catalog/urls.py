@@ -1,25 +1,28 @@
-# from django.urls import path
-# from . import views
-#
-# urlpatterns = [
-#     path('', views.home, name='home'),
-#     path('contacts/', views.contacts, name='contacts'),
-#     path('product/<int:pk>/', views.product_detail, name='product_detail'),
-#     path('product/create/', views.product_create, name='product_create'),  # НОВЫЙ URL
-# ]
+# catalog/urls.py
 
-# catalog/urls.py - ЗАМЕНЯЕМ на новую версию
 from django.urls import path
+from django.views.decorators.cache import cache_page
 from . import views
 
-app_name = 'catalog'  # Добавляем namespace для приложения
+app_name = 'catalog'
 
 urlpatterns = [
-    path('', views.HomeView.as_view(), name='home'),
+    # ✅ Главная страница - кэш 15 минут
+    path('', cache_page(60 * 15)(views.HomeView.as_view()), name='home'),
+
+    # Контакты - без кэша (форма обратной связи)
     path('contacts/', views.ContactsView.as_view(), name='contacts'),
-    path('product/<int:pk>/', views.ProductDetailView.as_view(), name='product_detail'),
+
+    # Детальная страница товара - кэш 10 минут (дополнительно к низкоуровневому)
+    path('product/<int:pk>/', cache_page(60 * 10)(views.ProductDetailView.as_view()), name='product_detail'),
+
+    # CRUD операции - без кэша (динамические)
     path('product/create/', views.ProductCreateView.as_view(), name='product_create'),
-    # НОВЫЕ МАРШРУТЫ:
     path('product/<int:pk>/update/', views.ProductUpdateView.as_view(), name='product_update'),
     path('product/<int:pk>/delete/', views.ProductDeleteView.as_view(), name='product_delete'),
+    path('product/<int:pk>/unpublish/', views.ProductUnpublishView.as_view(), name='product_unpublish'),
+
+    # Страница категории - кэш 5 минут
+    path('category/<str:category_name>/', cache_page(60 * 5)(views.CategoryProductsView.as_view()),
+         name='category_products'),
 ]
