@@ -50,7 +50,7 @@
                     <ul class="dropdown-menu">
                         {% for category in categories %}
                         <li>
-                            <a class="dropdown-item" href="{% url 'catalog:home' %}?category={{ category.name }}">
+                            <a class="dropdown-item" href="{% url 'catalog:category_products' category.name %}">
                                 {{ category.name }}
                             </a>
                         </li>
